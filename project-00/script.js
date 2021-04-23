@@ -162,8 +162,9 @@ scene.add(dot);
 // Add Orbit Controls
 const controls = new THREE.OrbitControls( camera, renderer.domElement );
 controls.enableDamping = true;
-camera.position.z = 5;
+camera.position.x = 0;
 camera.position.y = 1;
+camera.position.z = 5;
 
 //controls.update();
 
@@ -189,7 +190,7 @@ const animate = function () {
   cube.rotation.z += 0.0; // Roll
   
   // Dots
-    cone.rotation.x += 0.0; // Pitch
+  cone.rotation.x += 0.0; // Pitch
 	cone.rotation.y += 0.02; // Yaw
 	cone.rotation.z += 0.0; // Roll
 
