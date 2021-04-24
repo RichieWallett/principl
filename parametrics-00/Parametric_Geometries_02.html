@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>02.10 - Parametric Geometries 01</title> <!--See Cookbook 02.10-create-parametric-geometries.html-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/69/three.js"></script> <!--libs/three.js--><!--Version 69-->
+    <script src="https://cdn.jsdelivr.net/npm/dat.gui@0.7.7/build/dat.gui.min.js"></script> <!--libs/dat.gui.min.js-->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.101.1/examples/js/controls/TrackballControls.js"></script> <!--libs/TrackballControls.js-->
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+    <!--Removes favicon console-->
+    <link rel="shortcut icon" href="#"> 
+</head>
+<body>
+<script>
+
+    // global variables
+    var renderer;
+    var scene;
+    var camera;
+    var camControls; // Changed to Orbit controls
+
+
+    function init() {
+
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        scene = new THREE.Scene();
+
+        // create a camera, which defines where we're looking at.
+        camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camControls = new THREE.TrackballControls(camera); // Trackball version
+
+        // create a render, sets the background color and the size
+        renderer = new THREE.WebGLRenderer({ antialias: true, autoSize: true });
+        renderer.setClearColor(0x111111, 1.0);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        // Debug UI
+        const gui = new dat.GUI({closed: true, width: 300});
+        gui.hide(); // Press twice to show
+
+        
+        // 00 Re-Sizes Viewport
+        const sizes = {
+            width: window.innerWidth,
+            height: window.innerHeight
+        }
+            
+        window.addEventListener('resize', () =>
+        {
+            // Update sizes
+            sizes.width = window.innerWidth
+            sizes.height = window.innerHeight
+
+            // Update camera
+            camera.aspect = sizes.width / sizes.height
+            camera.updateProjectionMatrix()
+
+            // Update renderer
+            renderer.setSize(sizes.width, sizes.height)
+            //renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+        })
+
+        /*
+         OPTION 1
+        */
+
+        // create parametric and add to scene
+        // used http://reference.wolfram.com/mathematica/ref/ParametricPlot3D.html
+        // as reference
+        var paramFunction1 = function (u, v) {
+            var u = (u * 2 * Math.PI) - Math.PI;
+            var v = (v * 2 * Math.PI) - Math.PI;
+
+            var x = Math.sin(u) * Math.sin(v) + 0.05 * Math.cos(20 * v);
+            var y = Math.cos(u) * Math.sin(v) + 0.05 * Math.cos(20 * u);
+            var z = Math.cos(v);
+
+
+            return new THREE.Vector3(x, y, z);
+        }
+
+        /*
+         OPTION 2
+        */
+
+        // create parametric and add to scene
+        var paramFunction2 = function (u, v) {
+            var u = u * 2 * Math.PI;
+            var v = (v * 2 * Math.PI) - Math.PI;
+
+            var x = Math.cos(u);
+            var y = Math.sin(u) + Math.cos(v);
+            var z = Math.sin(v);
+
+
+            return new THREE.Vector3(x, y, z);
+        }
+
+        /*
+         OPTION 3
+        */
+
+        // create parametric and add to scene
+        // http://paulbourke.net/geometry/klein/
+        var paramFunction4 = function (u, v) {
+            var a = 3;
+            var n = 3;
+            var m = 1;
+
+            var u = u * 4 * Math.PI;
+            var v = v * 2 * Math.PI;
+
+            var x = (a + Math.cos(n * u / 2.0) * Math.sin(v) - Math.sin(n * u / 2.0) * Math.sin(2 * v)) * Math.cos(m * u / 2.0);
+            var y = (a + Math.cos(n * u / 2.0) * Math.sin(v) - Math.sin(n * u / 2.0) * Math.sin(2 * v)) * Math.sin(m * u / 2.0);
+            var z = Math.sin(n * u / 2.0) * Math.sin(v) + Math.cos(n * u / 2.0) * Math.sin(2 * v);
+
+            return new THREE.Vector3(x, y, z);
+        }
+
+
+        /*
+        LIGHTS
+        */
+        var directionalLight = new THREE.DirectionalLight();
+        directionalLight.position.set(-30, 50, 50);
+        scene.add(directionalLight);
+
+        /*
+        GEOMETRY CALL
+        */
+        var geom = new THREE.ParametricGeometry(paramFunction2, 200, 200); // Amount of vertices
+        var mat = new THREE.MeshPhongMaterial({color: 0xccFF33a, side: THREE.DoubleSide, /*shading: THREE.FlatShading*/wireframe: true});
+        var mesh = new THREE.Mesh(geom, mat);
+        mesh.name = 'param';
+        mesh.scale.set(10, 10, 10); // Set Scale
+
+        scene.add(mesh);
+
+        /*
+        CAMERA
+        */
+
+        // position and point the camera to the center of the scene
+        camera.position.x = -50;
+        camera.position.y = 25;
+        camera.position.z = 50;
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        camControls.update();
+
+        // datGUI
+        const folder4 = gui.addFolder('Camera');
+        folder4.add(camera.position, 'x').min(- 100).max(0).step(0.01).name('Axis X');
+        folder4.add(camera.position, 'y').min(0).max(100).step(0.01).name('Axis Y');
+        folder4.add(camera.position, 'z').min(- 150).max(150).step(0.01).name('Axis Z'); 
+        folder4.open(); // .close on load
+
+
+        // add the output of the renderer to the html element
+        document.body.appendChild(renderer.domElement);
+
+        // call the render function
+        render();
+    }
+
+    function render() {
+        renderer.render(scene, camera);
+        scene.getObjectByName('param').rotation.x += 0.001;
+        scene.getObjectByName('param').rotation.y += 0.001;
+        scene.getObjectByName('param').rotation.z += 0.001;
+        requestAnimationFrame(render);
+        camControls.update();
+    }
+
+    // calls the init function when the window is done loading.
+    window.onload = init;
+
+</script>
+</body>
+</html>
