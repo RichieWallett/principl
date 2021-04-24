@@ -3,7 +3,7 @@ The fundamentals for change
 
 ## Parametric Series
 
-https://github.com/RichieWallett/principl/tree/main/parametric-00
+https://github.com/RichieWallett/principl/tree/main/parametrics-00
 
 ---
 
