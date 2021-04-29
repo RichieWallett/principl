@@ -10,6 +10,4 @@
 
 ### Sample 03
 
-![Link](https://github.com/RichieWallett/principl/blob/main/parametrics-00/Screenshots/03/Screenshot%202021-04-24%20at%2016.07.39.png)
-
-
+![Link](https://github.com/RichieWallett/principl/blob/main/parametrics-00/Screenshots/03/Screenshot%202021-04-24%20at%2016.24.55.png)
